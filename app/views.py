@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
-from app.forms import MotosForm, ComprasForm
-from app.models import Motos, Compras
 from django.core.paginator import Paginator
+from django.shortcuts import render, redirect
+from app.forms import MotosForm, ComprasForm, HistForm
+from app.models import Motos, Compras, Hist
+
 
 def home(request):
     data = {}
@@ -10,6 +11,22 @@ def home(request):
     pages = request.GET.get('page')
     data['db'] = paginator.get_page(pages)
     return render(request, 'listmotos.html', data)
+
+def hist(request):
+    data = {}
+    all = Hist.objects.all()
+    paginator = Paginator(all, 10)
+    pages = request.GET.get('page')
+    data['db'] = paginator.get_page(pages)
+    return render(request, 'histcompras.html', data)
+
+def cad(request):
+    data = {}
+    all = Compras.objects.all()
+    paginator = Paginator(all, 10)
+    pages = request.GET.get('page')
+    data['db'] = paginator.get_page(pages)
+    return render(request, 'listclientes.html', data)
 
 def form(request):
     data = {}
@@ -20,6 +37,11 @@ def form1(request):
     data = {}
     data['form1'] = ComprasForm()
     return render(request, 'cadclientes.html', data)
+
+def form2(request):
+    data = {}
+    data['form2'] = HistForm()
+    return render(request, 'cadcompras.html', data)
 
 def create(request):
     form = MotosForm(request.POST or None)
@@ -32,6 +54,12 @@ def create1(request):
     if form.is_valid():
         form.save()
         return redirect('cad')
+
+def create2(request):
+    form = HistForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('hist')
 
 def view(request, pk):
     data = {}
@@ -50,6 +78,12 @@ def edit1(request, pk):
     data['form1'] = ComprasForm(instance=data['db'])
     return render(request, 'cadclientes.html', data)
 
+def edit2(request, pk):
+    data = {}
+    data['db'] = Hist.objects.get(pk=pk)
+    data['form2'] = HistForm(instance=data['db'])
+    return render(request, 'cadcompras.html', data)
+
 def update(request, pk):
     data = {}
     data['db'] = Motos.objects.get(pk=pk)
@@ -66,6 +100,14 @@ def update1(request, pk):
         form.save()
         return redirect('cad')
 
+def update2(request, pk):
+    data = {}
+    data['db'] = Hist.objects.get(pk=pk)
+    form = HistForm(request.POST or None, instance=data['db'])
+    if form.is_valid():
+        form.save()
+        return redirect('hist')
+
 def delete(request, pk):
     db = Motos.objects.get(pk=pk)
     db.delete()
@@ -76,10 +118,7 @@ def delete1(request, pk):
     db.delete()
     return redirect('cad')
 
-def cad(request):
-    data = {}
-    all = Compras.objects.all()
-    paginator = Paginator(all, 10)
-    pages = request.GET.get('page')
-    data['db'] = paginator.get_page(pages)
-    return render(request, 'listclientes.html', data)
+def delete2(request, pk):
+    db = Hist.objects.get(pk=pk)
+    db.delete()
+    return redirect('hist')

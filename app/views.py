@@ -20,6 +20,15 @@ def hist(request):
     data['db'] = paginator.get_page(pages)
     return render(request, 'histcompras.html', data)
 
+def hist(request):
+    data = {}
+    search = request.GET.get('search')
+    if search:
+        data['db'] = Hist.objects.filter(cpf__icontains=search)
+    else:
+        data['db'] = Hist.objects.all()
+    return render(request, 'histcompras.html', data)
+
 def cad(request):
     data = {}
     all = Compras.objects.all()
